@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+
+	<head >
+		<meta charset="utf-8">
+		<title>MOLC</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link href="../css/app.css" rel="stylesheet" />
+
+		<link rel="stylesheet" href="../Public/Mobile/ecshe_css/wapmain.css?v=1543408652" />
+		<script src="../js/mui.js"></script>
+		<script src="../js/child_tool.js"></script>
+		<script type="text/javascript" src="../Public/Mobile/js/jquery-1.11.3.min.js?v=1513784360"></script>
+		<script type="text/javascript" src="../Public/layer/layer.js?v=1513784360"></script>
+		<style>
+				.mui-table-view .mui-icon {margin-bottom:0.3125rem;font-size:1.875rem!important;}
+				.layui-layer-demo .layui-layer-title{border: none;background-color: #333;color: #fff;text-align: center;padding: 0}
+				.layui-layer-demo {width: 70%;background-color: #eee}
+				.layui-layer-demo .type_list {line-height: 40px;border-bottom: #999 1px solid;padding:0 10px;}
+				.layui-layer-demo .type_set {width: 90%;margin:  0 auto;padding: 10px 0;}
+			</style>
+	</head>
+	
+	<body>
+		<div id="header" class="mui-bar mui-bar-transparent">
+			<img class="mui-pull-left" src="../images/molc.png"  style="width: 2rem;height: 2rem;margin-top: 0.4rem;">
+			<h1 class="mui-title" style="color: #FFF;">功能</h1>
+		</div>
+		<!--星空背景-->
+		<div  id="demo">	
+		  <div class="canvaszz"></div>
+		  <canvas id="canvas" style="position:absolute;"></canvas> 
+		</div>
+		<!--星空背景结束-->
+		<div class="mui-slider" >
+			<div class="mui-slider-group" style="margin-top: 2.5rem;">
+				<div class="mui-slider-item"><a href="#"><img src="../images/banner1.jpg" /></a></div>
+				<div class="mui-slider-item"><a href="#"><img src="../images/banner1.jpg" /></a></div>
+				<div class="mui-slider-item"><a href="#"><img src="../images/banner1.jpg" /></a></div>
+			</div>
+			<div class="mui-slider-indicator">
+				<div class="mui-indicator mui-active"></div>
+				<div class="mui-indicator"></div>
+				<div class="mui-indicator"></div>
+			</div>
+		</div>
+<br>
+
+		<div class="mui-content cur-padding-bottom" style="padding-top:0;background-color: rgba(0,0,0,0);">
+			<ul class="mui-table-view mui-grid-view mui-grid-9" style="margin-top:0;background-color: rgba(0,0,0,0);border: 0px;">
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" style="border: 1px dotted #003366;">
+					<a onclick="call_main_func('open_html',3);">
+						<i class="mui-icon mui-icon-image"  style="color:#3ccb94;"></i>
+						<div class="mui-media-body" style="color:#FFF;">挖矿</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" style="border: 1px dotted #003366;">
+					<a href="#">  
+						<i class="mui-icon mui-icon-email" style="color:#50a3ff;"></i>
+						<div class="mui-media-body" style="color:#555;">区块浏览器</div>
+					</a>
+				</li>
+				
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" style="border: 1px dotted #003366;">
+					<a href="#">
+						<i class="mui-icon mui-icon-chatbubble" style="color:#ff9b58;"></i>
+						<div class="mui-media-body"  style="color:#555;">理财</div>
+					</a>
+				</li>
+		      <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" style="border: 1px dotted #003366;">
+					<a href="#">
+						<i class="mui-icon mui-icon-location" style="color:#ff9b58;"></i>
+						<div class="mui-media-body" style="color:#555;">IEO中心</div>
+					</a>
+			  </li>
+				
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" style="border: 1px dotted #003366;">
+					<a href="#" onclick="call_main_func('open_html',9);">
+						<i class="mui-icon mui-icon-search" style="color:#50a3ff;"></i>
+						<div class="mui-media-body"  style="color:#FFF;">公告</div>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" style="border: 1px dotted #003366;">
+					<a href="#">
+						<i class="mui-icon mui-icon-phone" style="color:#3ccb94;"></i>
+						<div class="mui-media-body" style="color:#555;">帮助</div>
+					</a>
+				</li>
+				
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" style="border: 1px dotted #003366;">
+					<a href="#">
+						<i class="mui-icon mui-icon-gear" style="color:#50a3ff;"></i>
+						<div class="mui-media-body" style="color:#555;">Eexpect</div>
+					</a>
+		          </li>
+				<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" style="border: 1px dotted #003366;">
+					<a href="#">
+						<i class="mui-icon mui-icon-info" style="color:#3ccb94;"></i>
+						<div class="mui-media-body" style="color:#555;">Eexpect</div>
+					</a>		     
+		      </li> 
+			  <li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" style="border: 1px dotted #003366;">
+			  		<a href="#">
+			  			<i class="mui-icon mui-icon-more" style="color:#ff9b58;"></i>
+			  			<div class="mui-media-body" style="color:#555;">其它</div>
+			  		</a>		      
+			  </li>
+			</ul> 
+		</div>
+		
+		
+		
+		<script src="../js/air.js"></script>
+		<script>
+		function trends() {
+			$.getJSON('/ajax/index_b_trends?t=' + Math.random(), function (d) {
+				trends = d;
+				allcoin();
+			});
+		}
+		function allcoin(cb) {
+			var trade_qu_id = $('.mui-scroll .mui-active').attr('data');
+			$.get('/ajax/allcoin_a/id/' + trade_qu_id + '?t=' + Math.random(), cb ? cb : function (data) {
+				var datas;
+				if (data.status == 1) { datas = data.url; }
+				renderPage(datas);
+				t = setTimeout('allcoin()', 5000);
+			}, 'json');
+		}
+		function renderPage(ary) {
+			var html = '';
+			for (var i in ary) {
+				ifcolor_1 = (ary[i][8] >= 0 ? 'btn-up' : 'btn-down');
+				ifcolor_2 = (ary[i][8] >= 0 ? 'icon-up' : 'icon-down');
+				html += '<li class="mui-table-view-cell mui-collapse-content"><a href="/Trade/index/market/' + ary[i][9] + '/"><dt class="fl market"style="width:43%"><div class="fl imgs"><img src="/Upload/coin/' + ary[i][10] + '"width="25"height="25"/></div><div class="fl cname"><p><span class="coin_name">' + ary[i][0] + '</span><span> / ' + ary[i][1] + '</span></p><p>24h量 ' + formatCount(ary[i][7]) + '</p></div></dt><dt class="fl deal"style="width:30%"><div><p>' + ary[i][2] + '</p><p>￥' + ary[i][14] + '</p></div></dt><dt class="fr float"style="width:23.66%"><span class="fr ' + ifcolor_1 + '">' + (parseFloat(ary[i][8]) < 0 ? '' : '+') + ((parseFloat(ary[i][8]) < 0.01 && parseFloat(ary[i][8]) > -0.01) ? "0.00" : (parseFloat(ary[i][8])).toFixed(2)) + '%</span></dt></a></li>';
+			}
+			$('#coins_list').html(html);
+		}
+		function formatCount(count) {
+			var countokuu = (count / 100000000).toFixed(3);
+			var countwan = (count / 10000).toFixed(3);
+			if (count > 100000000) {return countokuu.substring(0, countokuu.lastIndexOf('.') + 3) + '亿';}
+			if (count > 10000) {return countwan.substring(0, countwan.lastIndexOf('.') + 3) + '万';}else {return count;}
+		}
+		function trade_qu(o){
+			$('.mui-control-item').removeClass('mui-active');
+			$(o).addClass('mui-active');
+			allcoin();
+		}
+		trends();
+		</script>
+		<script>
+		$(document).ready(function(){
+			$('#menu_2').addClass('mui-active');
+		});
+		
+		function get_message(sysmsg,msg) {}; 
+		</script>
+
+	</body>
+
+</html>
