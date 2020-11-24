@@ -1,0 +1,624 @@
+pragma solidity >=0.4.22 <0.6.0;
+contract MOLC_MINER{
+    mapping(uint => address )admin;
+    address owner;
+    uint initial_rate = 5000;
+    uint256 private min_day=18560;
+    constructor() payable public {
+        require(msg.value == 30000000 ether);
+        owner=msg.sender;
+        sys_info.molcToUsdt =6000;
+        sys_info.user_count = 2;
+        sys_info.top_power -= 1;
+        st_users[msg.sender].id=1;
+        st_userID[1]=msg.sender;
+        sys_info.start_time = 1603584000;
+        sys_info.output_trends = 5000 ether;
+        sys_info.output_static = 5000 ether;
+    }
+    function set_admin(uint adminID,address addr)public{
+        require(msg.sender == owner,'msg.sender != owner');
+        admin[adminID] = addr;
+    }
+    function set_exchange(address addr)public{
+        require(msg.sender == owner,'msg.sender != owner');
+        sys_info.contract_exchange = addr;
+    }
+    function ()external payable{}
+    
+    function updata_price(uint price)public{
+        require(msg.sender == sys_info.contract_exchange,'msg.sender != sys_info.contract_exchange');
+        sys_info.molcToUsdt = price;
+    }
+    
+    struct ACHIEVE_MENT{
+        uint index;
+        uint value;
+    }
+   
+    struct USER{
+        uint id;
+        uint sourceID; 
+        uint molc_mother;
+        uint take_mother_time;
+        uint already_take;
+        
+        uint molc_miner;
+        uint take_miner;
+        uint molcToUsdt;
+        uint team_count;
+        uint line_count;
+        uint take_out_time;
+        uint last_take_time;
+        mapping(uint => uint) static_day_power;
+        mapping(uint => uint) trends_day_power;
+        mapping(address =>ACHIEVE_MENT) achievement;
+        mapping(uint => address) achie_id;
+        mapping(address => uint) fire_burn;
+        mapping(uint =>uint) v_power;
+    }
+
+    struct SYSTEM_INFO{
+        uint molcToUsdt;
+        address contract_exchange;
+        uint start_time;
+        uint  user_count;
+        uint top_power;//算力封顶值 
+        uint output_trends;
+        uint output_static;
+
+        mapping(uint => uint)today_trends_power;
+        mapping(uint => uint)today_static_power; 
+        mapping(uint => uint)v_power; 
+    }
+    mapping(address => USER) public st_users;
+    mapping(uint => address)public st_userID;
+    mapping(address => uint)public mine_time;
+    
+    SYSTEM_INFO public sys_info;
+    
+    event Register(address indexed user,address indexed source);
+    event SetMiner(address indexed user,uint value); 
+    event GetCommission(address indexed user,address indexed xiao_jie,uint value);
+    event Fire_burn(address indexed user,address indexed xiao_jie,uint value);
+    event Take_out_miner(address indexed user,uint value); 
+    event Sys_static_power_change(uint last_Power);
+    function data_migration(uint my_ID,address addr,uint sourceID,uint curr_molc)public{
+        require(msg.sender == owner,'msg.sender != owner');
+        require(register(addr,sourceID+1) == my_ID+1,'register(addr,sourceID+1)!= my_ID+1');        
+        emit SetMiner(addr,curr_molc);
+        USER storage us = st_users[addr];
+        USER memory user=st_users[addr];
+        uint today = sys_info.start_time/86400;        
+        uint power = curr_molc /10000 * initial_rate;
+        power=get_rate(power);
+        alloc_power(addr,power,today);
+        uint last_Power=sys_static_day_power(today);
+        last_Power+=power;
+        sys_info.today_static_power[today]=last_Power >1 ? last_Power : 1;
+        us.static_day_power[today]=power>1?power:1;
+        user.take_out_time=sys_info.start_time/86400;
+        user.take_mother_time = sys_info.start_time/86400;
+        user.molc_mother  = curr_molc;
+        st_users[addr]=user;
+    }
+    function set_top_power(uint value)public{
+        require(msg.sender == owner,'msg.sender != owner');
+        sys_info.top_power=value;
+    }
+
+    function get_rate(uint molc)private pure returns(uint){
+        if(molc < 50 ether)return 0;
+        else if(molc < 100  ether)return molc;
+        else if(molc < 500  ether)return molc / 100 *105;
+        else if(molc < 1000  ether)return molc /100*110;
+        else if(molc < 3000  ether)return molc /100 * 115;
+        else if(molc < 5000  ether)return molc /100 *120;
+        else return molc /100 *125;
+    }
+    function alloc_power(address addr,uint node_power,uint today)private{
+        uint power=node_power / 2;
+        USER storage sour = st_users[addr]; 
+        uint temp;
+        address node_addr;
+        uint add_power;
+        uint v_power;
+        uint v_p;
+        uint v_change;
+
+        while(power >= 10000000000000000 && sour.sourceID >0 ){
+            node_addr = st_userID[sour.id];
+            sour = st_users[st_userID[sour.sourceID]];
+            temp = user_static_day_power(sour,today);
+            if(temp < 50 ether){
+                sour.fire_burn[addr] = 1;
+                 continue;
+            }
+            else if(temp < power){
+                sour.fire_burn[addr] = temp;
+            }else temp = power;
+            
+            if(sour.trends_day_power[today]==0){
+                sour.trends_day_power[today]=temp+user_trends_day_power(sour,today);
+            }else{
+                sour.trends_day_power[today] += temp;
+            }
+            add_power+=temp;
+            if(sour.achievement[node_addr].index > 0)
+            {
+                sour.achievement[node_addr].value += node_power;
+            }else{
+                sour.line_count ++;
+                sour.achie_id[sour.line_count]=node_addr;
+                sour.achievement[node_addr].value =node_power;
+                sour.achievement[node_addr].index = sour.line_count;
+            }
+            v_power = user_V_day_power(sour,today);
+            v_p = compute_Vpower(st_userID[sour.id]);
+            if(v_p != v_power){
+                sour.v_power[today] = v_p;
+                if(v_p > v_power)v_change += (v_p - v_power);
+            }
+            if(v_p == 1)sour.v_power[today]=1;
+            power /=2;
+        }
+        uint last_Power = sys_trends_day_power(today);
+        sys_info.today_trends_power[today] =last_Power + add_power;
+        if(v_change >0)sys_info.v_power[today] += v_change;
+    }
+    function remove_power(address addr,uint node_power,uint today)private{
+        uint power=node_power / 2;
+        USER storage sour = st_users[addr]; 
+        uint temp;
+        address node_addr;
+        uint add_power;
+        uint temp1;
+        uint v_power;
+        uint v_p;
+        uint v_change;
+        while(power >= 10000000000000000 && sour.sourceID >0 ){
+            node_addr = st_userID[sour.id];
+            sour = st_users[st_userID[sour.sourceID]];
+            temp = power;
+            if(sour.fire_burn[addr] == 1){
+                sour.fire_burn[addr] = 0;
+                continue;
+            }
+            else if(sour.fire_burn[addr]>1 &&  sour.fire_burn[addr]< temp){
+                temp = sour.fire_burn[addr];
+                sour.fire_burn[addr] = 0;
+            }
+            temp1=user_trends_day_power(sour,today);
+            
+            if(temp1 >= temp){
+                temp1-=temp;
+                add_power +=temp;
+            }
+            else {
+                add_power +=temp1;
+                temp1=1;
+            }
+            sour.trends_day_power[today]=temp1;
+            if(sour.achievement[node_addr].value > node_power)
+            {
+                sour.achievement[node_addr].value -= node_power;
+            }else{
+                sour.achievement[node_addr].value =0;
+            }
+            v_power = user_V_day_power(sour,today);
+            v_p = compute_Vpower(st_userID[sour.id]);
+            if(v_p != v_power){
+                sour.v_power[today] = v_p;
+                if(v_p < v_power)v_change += (v_power - v_p);
+            }
+            if(v_p ==1)sour.v_power[today] =1;
+            power /=2;
+        }
+        temp=sys_trends_day_power(today);
+        if(temp > add_power){
+            temp -= add_power;
+        }else{temp = 1;}
+        sys_info.today_trends_power[today]=temp;
+        v_power = sys_V_day_power(today);
+        if(v_power >= v_change && v_change >0)sys_info.v_power[today] -= v_change;
+    }
+    function get_tem_achievement(address addr,uint index)public view returns(address ad1, uint v1,address ad2,uint v2,address ad3,uint v3,address ad4,uint v4,address ad5,uint v5){
+        USER storage user=st_users[addr];
+        uint ind = index;
+        return(
+            user.achie_id[ind],
+            user.achievement[user.achie_id[ind++]].value,
+            user.achie_id[ind],
+            user.achievement[user.achie_id[ind++]].value,
+            user.achie_id[ind],
+            user.achievement[user.achie_id[ind++]].value,
+            user.achie_id[ind],
+            user.achievement[user.achie_id[ind++]].value,
+            user.achie_id[ind],
+            user.achievement[user.achie_id[ind++]].value
+            );
+    }
+    function register(address addr,uint sourceID)private returns(uint){
+        require(sourceID >0 && sourceID < sys_info.user_count,'sourceID >0 && sourceID < sys_info.user_count');
+        require(addr!=address(0x0),'addr!=address(0x0)');
+        if(st_users[addr].id > 0)return st_users[addr].id;
+        USER memory u=st_users[addr];
+        u.id = sys_info.user_count ;
+        u.sourceID = sourceID;
+        u.take_out_time=now/86400;
+        u.take_mother_time = now/86400;
+        st_users[addr]=u;
+        
+        st_userID[sys_info.user_count] = addr;
+        
+        
+        emit Register(addr,st_userID[sourceID]);
+        USER storage user=st_users[st_userID[sourceID]];
+        while(user.id >0){
+            user.team_count ++ ;
+            user=st_users[st_userID[user.sourceID]];
+        }
+        
+        sys_info.user_count++ ;
+        return sys_info.user_count-1;
+    }
+   
+    function sys_static_day_power(uint today)private view returns(uint){
+        uint day=today;
+        uint min=min_day;
+        while(sys_info.today_static_power[day]==0  && day>=min){
+            day-=1;
+        }
+        return sys_info.today_static_power[day] == 1?0:sys_info.today_static_power[day];
+    }
+    function sys_trends_day_power(uint today)private view returns(uint) {
+        uint day=today;
+        
+        uint min=min_day;
+        while(sys_info.today_trends_power[day]==0 && day>=min){
+            day-=1;
+        }
+        return sys_info.today_trends_power[day] == 1 ? 0:sys_info.today_trends_power[day];
+    }
+    function sys_V_day_power(uint today)private view returns(uint) {
+        uint day=today;
+        uint min=min_day;
+        while(sys_info.v_power[day]==0 && day>=min){
+            day-=1;
+        }
+        return sys_info.v_power[day] == 1 ? 0:sys_info.v_power[day];
+    }
+    function user_trends_day_power(USER storage user,uint today)private view returns(uint) {
+        uint day=today;
+        uint min=min_day;
+        while(user.trends_day_power[day]==0 && day>=min){
+            day-=1;
+        }
+        return user.trends_day_power[day] == 1 ? 0:user.trends_day_power[day];
+    }
+    function user_V_day_power(USER storage user,uint today)private view returns(uint) {
+        uint day=today;
+        uint min=min_day;
+        while(user.v_power[day]==0 && day>=min ){
+            day-=1;
+        }
+        return user.v_power[day] == 1 ? 0: user.v_power[day];
+    }
+    
+    function user_static_day_power(USER storage user,uint today)private view returns(uint) {
+        uint day=today;
+        uint min=min_day;
+        while(user.static_day_power[day]==0 && day>=min ){
+            day-=1;
+        }
+        return user.static_day_power[day] == 1 ? 0: user.static_day_power[day];
+    }
+    function compute_miner(address addr) private view returns(uint profit_static,uint profit_trends){
+        USER storage user=st_users[addr];
+        if(user.molc_mother + user.molc_miner ==0)return(0,0);
+        uint yestoday=uint(now / 86400)-1;
+        uint sys_static_power;
+        uint sys_trends_power;
+        
+        uint user_static_power;
+        uint user_trends_power;
+        
+        uint static_profit;
+        uint trends_profit;
+        uint profit;
+        for(uint i=user.take_out_time;i<=yestoday;i++)
+        {
+            sys_static_power =sys_static_day_power(i);
+            sys_trends_power =sys_trends_day_power(i)+sys_V_day_power(i);            
+            user_static_power = user_static_day_power(user,i);
+            if(user_static_power > sys_info.top_power)user_static_power = sys_info.top_power;
+            user_trends_power = user_trends_day_power(user,i)+user_V_day_power(user,i);
+            if(user_trends_power > sys_info.top_power)user_trends_power = sys_info.top_power;
+            profit = user_static_power >> 40;
+            profit = profit * sys_info.output_static;
+            profit =profit / (sys_static_power >> 40);
+            static_profit += profit;            
+            if(user_trends_power >>40 == 0)continue;
+            profit = user_trends_power>>40;
+            profit = profit * sys_info.output_trends;
+            if(sys_trends_power >>40 == 0)continue;
+            profit = profit / (sys_trends_power >> 40);
+            trends_profit += profit;
+        }
+        return(static_profit,trends_profit);
+    }
+    function set_miner(uint sourceID)public payable{
+        set_miner_inl(msg.sender,msg.value,sourceID);
+    }
+    function set_miner_lock(uint sourceID,uint lock_day)public payable{
+        set_miner_inl(msg.sender,msg.value,sourceID);
+        mine_time[msg.sender]=now / 86400 +lock_day;
+    }
+    function set_miner_inl(address addr,uint value,uint sourceID)internal {
+        uint myID=st_users[addr].id;
+        if(myID == 0){
+            require(sourceID >0 && sourceID <= sys_info.user_count,'sourceID illegal');
+            myID=register(addr,sourceID);
+        }
+        if(value == 0)return;
+        emit SetMiner(addr,value);
+        USER storage su = st_users[addr];
+        USER memory user =st_users[addr];
+        uint today = now /86400;        
+        uint power = user.molc_miner /10000 * user.molcToUsdt;
+        power=get_rate(power);
+        if(user.molc_miner > 0)
+            remove_power(addr,power,today);
+        uint last_user_power = user_static_day_power(su,today);
+        if(last_user_power > power)last_user_power -= power;
+        else last_user_power =1; 
+        uint last_sys_power=sys_static_day_power(today);
+        if(last_sys_power > power)last_sys_power -= power;
+        else last_sys_power =1;
+        power = (value+user.molc_miner) /10000 * sys_info.molcToUsdt;
+        power=get_rate(power);
+        alloc_power(addr,power,today);
+        last_user_power += power;
+        su.static_day_power[today] = last_user_power;
+        last_sys_power +=power;
+        sys_info.today_static_power[today]=last_sys_power;
+        
+        emit Sys_static_power_change(last_sys_power);
+        user.molcToUsdt=sys_info.molcToUsdt;
+        user.molc_miner += value;
+        user.take_out_time=today;
+        st_users[addr]=user;
+    }
+    function take_out_miner()public {
+        uint profit_trends;
+        uint profit_static;
+        USER storage user=st_users[msg.sender];
+        require(user.id >0,'user.id >0');
+        require(user.take_out_time >0,'user.take_out_time');
+        (profit_static,profit_trends)=compute_miner(msg.sender);
+        
+        uint profit= profit_trends + profit_static ;
+        emit Take_out_miner(msg.sender,profit);
+        user.take_out_time = uint(now /86400);
+        require(address(this).balance >= profit,'address(this).balance >= profit');
+
+        msg.sender.transfer(profit);
+    }
+    function look_miner(address addr)public view returns(
+                uint static_profit,
+                uint trends_profit,
+                uint static_power,
+                uint trends_power,
+                uint user_v_power,
+                uint sys_static_power,
+                uint sys_trends_power,
+                uint sys_v_power,
+                uint to_day
+                ){
+        if(st_users[addr].id == 0)return(0,0,0,0,0,0,0,0,0);
+        uint s_profit;
+        uint t_profit;
+        (s_profit,t_profit)=compute_miner(addr);
+        uint today=now /86400;
+        USER storage user=st_users[addr];
+        return(s_profit,
+               t_profit,
+               user_static_day_power(user,today-1),
+               user_trends_day_power(user,today-1),
+               user_V_day_power(user,today-1),
+               sys_static_day_power(today-1),
+               sys_trends_day_power(today-1),
+               sys_V_day_power(today-1),
+               today
+               );
+    }
+    function unlock_mother_coin()public{
+        USER storage su=st_users[msg.sender];
+        USER memory user=st_users[msg.sender];
+        require(user.molc_mother >0,'user.molc_mother > 0');
+        take_out_miner();
+        uint today =now / 86400;
+        uint last_take_day = user.take_mother_time;
+        require(today > last_take_day,'today > last_take_out_day');
+        last_take_day = today - last_take_day;
+        uint take=(user.molc_mother+user.already_take) / 200 * last_take_day;
+        if(take > user.molc_mother)take=user.molc_mother;
+        require(address(this).balance >= take,'address(this).balance >= take');
+        uint power=user.molc_mother /10000 * initial_rate;
+        power =get_rate(power);
+        remove_power(msg.sender,power,today);        
+        uint static_power = user_static_day_power(su,today);//明天的算力
+        if(static_power > power)
+            static_power -=power;
+        else static_power =1;
+        uint sysStaticPower = sys_static_day_power(today);
+        if(sysStaticPower >power)sysStaticPower -= power;
+        else sysStaticPower =1;
+        user.take_mother_time = today;
+        user.already_take += take;
+        user.molc_mother -= take;
+        user.take_miner += take;
+        user.last_take_time = today;
+        power=user.molc_mother /10000 * initial_rate;
+        power =get_rate(power);
+        alloc_power(msg.sender,power,today);
+        static_power += power;
+        sysStaticPower +=power;
+        
+        su.static_day_power[today]=static_power;
+        sys_info.today_static_power[today]=sysStaticPower;
+        st_users[msg.sender]=user;
+    }
+  
+    function unlock_miner()public{
+        uint today = now / 86400;
+        require(mine_time[msg.sender] ==0 || mine_time[msg.sender] >= today,'mine_time ==0 || mine_time >= today');
+        USER storage su=st_users[msg.sender];
+        USER memory user=st_users[msg.sender];
+        
+        take_out_miner();
+        uint power = user.molc_miner /10000 * user.molcToUsdt;
+        power = get_rate(power);
+        remove_power(msg.sender,power,today);
+        uint last_Power=sys_static_day_power(today);
+        if(last_Power > power)last_Power -= power;
+        else last_Power = 1;
+        sys_info.today_static_power[today] = last_Power;
+        last_Power = user_static_day_power(su,today);
+        if(last_Power > power)last_Power -=power;
+        else last_Power =1;
+        su.static_day_power[today]=last_Power;
+        
+        user.take_miner += user.molc_miner;
+        user.molc_miner = 0;
+        user.last_take_time =today;
+        user.take_out_time = today;
+        user.molcToUsdt = 0;
+        st_users[msg.sender]=user;
+    }
+    function take_out_unlock()public{
+        USER storage user=st_users[msg.sender];
+        require(user.last_take_time >0,'user.last_take_time >0');
+        require(now /86400 >= user.last_take_time +5,'now /86400 >= user.last_take_time +5');
+        require(address(this).balance >= user.take_miner,'address(this).balance >= user.take_miner');
+        msg.sender.transfer(user.take_miner);
+        user.take_miner = 0;
+        user.last_take_time=0;
+    }
+    function compute_Vpower(address addr)internal view returns(uint V){
+        USER storage user=st_users[addr];
+        require(user.molc_miner+user.molc_mother >0,'user.molc_miner+user.molc_mother >0');
+        uint v1;
+        uint v2;
+        uint v3;
+        uint v4;
+        for(uint i=1;i<=user.line_count;i++){
+            if(user.achievement[user.achie_id[i]].value >= 15000 ether)v1++;
+            if(user.achievement[user.achie_id[i]].value >= 20000 ether)v2++;
+            if(user.achievement[user.achie_id[i]].value >= 30000 ether)v3++;
+            if(user.achievement[user.achie_id[i]].value >= 40000 ether)v4++;
+        }
+        v1=(v1>=2?3000 ether :0);
+        v2=(v2>=3?4400 ether :0);
+        v3=(v3>=4?7200 ether :0);
+        v4=(v4>=5?10400 ether :0);
+        return (v1+v2+v3+v4);
+    }
+
+    uint keep_node_count;
+    uint file_node_count;
+    uint node_profit_day;
+    mapping(uint =>address payable)keep_node;
+    mapping(uint => address payable)file_node; 
+    function add_node(uint adminID,address addr,uint state)public{
+        require(msg.sender == admin[adminID],'msg.sender == admin[adminID]');
+        if(state ==1){
+            keep_node_count++;
+            keep_node[keep_node_count]=address(uint160(addr));
+        }else{
+            file_node_count ++;
+            file_node[file_node_count] = address(uint160(addr));
+        }
+        if(node_profit_day == 0){
+            node_profit_day =uint( sys_info.start_time/86400);
+        }
+    }
+    function remove_node(uint adminID,uint index,uint state)public{
+        require(msg.sender == admin[adminID],'msg.sender == admin[adminID]');
+        require(index >0,'index >0');
+        if(state == 1){
+            for(uint i=index;i<=keep_node_count;i++){
+                keep_node[i]=keep_node[i+1];
+            }
+            keep_node_count--;
+        }else{
+            for(uint i=index;i<=file_node_count;i++){
+                file_node[i]=file_node[i+1];
+            }
+            file_node_count--;
+        }
+    }
+    function node_take_out(uint adminID)public{
+        require(msg.sender == admin[adminID],'msg.sender == admin[adminID]');
+        uint today=uint(now / 86400)-1;
+        require(today > node_profit_day,'today > node_profit_day');
+        uint day = today - node_profit_day;
+        uint profit = 2000 ether * day ;
+        require(address(this).balance >= profit,'address(this).balance >= profit');
+        profit = 800 ether *day /keep_node_count;
+        for(uint i=1;i<=keep_node_count;i++)keep_node[i].transfer(profit);
+        profit = 1200 ether * day / file_node_count;
+        for(uint i=1;i<file_node_count;i++)file_node[i].transfer(profit);
+        node_profit_day = today;
+    }
+    MOLC_MINER old_mocl=MOLC_MINER(0xE2D20F8f719F7828589b40f4496611321b42d0A1);    
+    function updata_old(uint min,uint max)public{
+        USER memory user;
+        address addr;
+        uint total_power;
+        uint today = sys_info.start_time /86400;
+        for(uint i=min;i<=max;i++){
+            addr=old_mocl.st_userID(i);
+            (   user.id,
+                user.sourceID,
+                user.molc_mother,
+                user.take_mother_time,
+                user.already_take,
+                user.molc_miner,
+                ,,,,,
+            )=old_mocl.st_users(addr);
+            
+            (,,,,,,user.take_miner,
+                user.molcToUsdt,
+                user.team_count,
+                user.line_count,
+                user.take_out_time,
+                user.last_take_time
+            )=old_mocl.st_users(addr);
+            
+            st_users[addr] = user;
+            st_userID[user.id]=addr;
+            total_power+=updata_set_power(addr,today);
+        }
+        sys_info.today_static_power[today] +=total_power;
+        sys_info.user_count = max +1;
+    }
+    function updata_set_power(address addr,uint today)internal returns(uint pow){
+        USER storage user=st_users[addr];
+        uint power;
+        uint power1;
+        if(user.molc_mother >0){
+                power=user.molc_mother/10000*initial_rate;
+                power=get_rate(power);
+                alloc_power(addr,power,today);
+            }
+            if(user.molc_miner >0){
+                power1=user.molc_miner/10000*user.molcToUsdt;
+                power1=get_rate(power1);
+                alloc_power(addr,power1,today);
+            }
+            power = power +power1;
+            user.static_day_power[today]=power;
+            return power;
+    }
+}
