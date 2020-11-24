@@ -1,0 +1,600 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>MOLC</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link href="../css/app.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../Public/Mobile/ecshe_css/wapmain.css?v=1543408652" />
+		<script type="text/javascript" src="../js/molc_key.js"></script>
+		<style>
+			table{
+				width:90%;
+				text-align:center;
+				margin-left: 5%;
+				margin-top: 2rem;
+			}
+			tr{
+				border:1px solid #050;
+				border-left-style: none; 
+				border-right-style: none;
+				font-size: 0.7rem;
+				height: 2.5rem;
+			}
+			td{
+				border:0px;
+				border-left-style: none; 
+				border-right-style: none;
+				font-size: 0.8rem;
+				
+			}
+			li{
+				background-color: rgba(0,0,0,0);
+			}
+			
+		</style>
+		
+		<style>
+			h5 {
+				margin-bottom: 10px;
+				text-align: left;
+			}
+			
+			.mui-demo-container{
+				background-color: #fff;
+				padding: 10px 15px;
+			}
+			
+			.mui-btn-block{
+				padding: 5px 0;
+			}
+			
+			#demo5 .mui-progressbar{
+				margin: 15px 10px;
+			}
+			
+			.mui-progressbar-success span {
+				background-color: #4cd964;
+			}
+			.mui-progressbar-warning span {
+				background-color: #f0ad4e;
+			}
+			.mui-progressbar-danger span {
+				background-color: #dd524d;
+			}
+			.mui-progressbar-royal span {
+				background-color: #8a6de9;
+			}
+			
+			/*Android平台使用父子webview，因此需要修改顶部进度条的显示位置*/
+			.mui-plus.mui-android>.mui-progressbar{
+				top:0
+			}
+			
+			
+			progress {
+			    border-radius: 5px;			    
+			    background-color: rgba(0,0,0,0);
+			}
+			  
+			progress::-webkit-progress-bar {
+				border-radius: 5px;
+			    background-color: rgba(0,0,0,0);
+			}
+			  
+			progress::-webkit-progress-value {
+			    background-color: #6633bb;
+				border-radius: 5px;
+			}
+		</style>
+	</head>
+
+	<body >
+		<script src="../js/mui.js"></script>
+		<script src="../js/child_tool.js"></script>
+		<script type="text/javascript" src="../js/clipboard.js"></script>
+		
+		<div  id="demo">
+		  <div class="canvaszz"></div>
+		  <canvas id="canvas" style="position:absolute;"></canvas> 
+		</div>
+		
+		<script type="text/javascript">	
+			var clipboard=new Clipboard('.copy_btn', {
+				text: function(trigger) {
+					var ret=document.getElementById('user_flags').innerHTML;
+					
+					ret='MOLC项目基于MOLC平台，采用去中心化POS质押挖矿模式，完全的链上运行，数据公开透明，不可篡改，永不断网。MOLC每天限量产出12000枚，有效杜绝泡沫，MOLC是一个长期项目，币子稀缺，价值无限。网址：https://moler.vip下载APP，挖矿时输入推荐码：'+num_to_base36(eth_data.ID);
+					return ret;
+				}
+			});
+			var Lang_1='复制成功';
+			var Lang_2='复制失败';
+			
+			clipboard.on('success', function(e) {        
+				alert(Lang_1+'：\n'+e.text);//复制成功
+			}); 
+			
+			clipboard.on('error', function(e) {        
+				alert(Lang_2);//复制失败
+			});
+			
+			//-------------------------------
+			var clipboard1=new Clipboard('.copy_btn1', {
+				text: function(trigger) {
+					//var ret=document.getElementById('user_flags').innerHTML;
+					return num_to_base36(eth_data.ID);
+					//return ret; 
+				}
+			});
+								
+			clipboard1.on('success', function(e) {        
+				alert(Lang_1+'：\n'+e.text);//复制成功
+			}); 
+			
+			clipboard1.on('error', function(e) {        
+				alert(Lang_2);    
+			});
+		</script>
+		
+		<div class="mui-bar mui-bar-nav" style="background-color: rgba(0,0,0,0.2);">
+			<img class="mui-pull-left" src="../images/molc.png" style="width: 2rem;height: 2rem;margin-top: 0.4rem;">
+			<h1 class="mui-title" style="color: #FFF;">质押挖矿</h1> 
+		</div>
+		<div id="load_ico" style="position: absolute;inline-start;margin: 10rem 10rem 10rem 8rem; z-index:9999;display: none;">
+			<span class="mui-spinner" style="width:5rem;height:5rem;"></span> 
+			<span id="show_stage" style="color: #F00;">等待MOLC链回应...</span>
+		</div>
+		<div class="mui-content msg_box" id="div_view" style="margin-top: 3rem;background-color: rgba(0,0,0,0);">
+			<div id="slider" class="mui-slider" >
+				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted" >
+					
+					<a class="mui-control-item" href="#item1mobile" >
+						质押挖矿
+					</a>
+					<a class="mui-control-item" href="#item2mobile">
+						取矿退押
+					</a>
+					<a class="mui-control-item" href="#item3mobile">
+						质押明细
+					</a>
+				</div>
+				<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-4" ></div>
+				<div id="back_group" class="mui-slider-group">					
+					<!--第一页 -->
+					<div id="item1mobile" class="mui-slider-item mui-control-content"  style="height: 32rem;">
+						<ul class="mui-table-view" style="background-color: rgba(0,0,0,0);margin-top: 1rem;border: 0px none #000000;">
+								<li style="margin-top: 1rem;">
+									<label><span id="cpn_18">可用MOLC：</span><span id="chain_MOLC"  style="color:#FFFFFF">----</span></label>
+								</li>
+								<li style="margin-top: 1rem;" >
+									
+									<label >推荐人：
+									<input id="source_before" type="text" placeholder="请输入邀请码" style="border: 0px;background-color: rgba(0,0,0,0);color: #FFF;text-align: center;width: 58%;margin: -1rem 0px -1rem 0px;">
+									</label>
+								</li>
+								<li style="margin-top: 1rem;" >
+									<label>质押金：
+									<input id="input_box_MOLC" type="number" placeholder="请输入用于质押挖矿的MOLC" style="border: 0px;background-color: rgba(0,0,0,0);color: #FFF;text-align: center;width: 58%;margin: -1rem 0px -1rem 0px;">
+									</label>
+								</li>								
+								<li style="margin-top: 1rem;" >
+									<label><span id="cpn_18">最低挖矿：</span><span id="miner_minimum"  style="color:#FFFFFF">----</span></label>
+								</li>
+								<li style="margin-top: 1rem;" >									
+									<div style="margin: 2rem 0px 2rem 0px;">
+										<button type="button" id="start_miner_button" class="fild_button">开始挖矿</button>
+									</div>														
+								</li>
+								<li style="margin-top: 1rem;" >
+									<p id="cpn_19" style="color: #0f0;font-size: 0.8rem;">注：质押挖矿需要矿工费，由MOLC链矿工收取，请在钱包留出足够MOLC作为矿工费</p>
+									<p id="cpn_19" style="color: #0f0;font-size: 0.8rem;">注：重复质押时，请将未取出的产出先取出来，否则会覆</p>
+									
+								</li>
+								<li style="margin-top: 1rem;" >
+									<div style="text-align: center;">
+										<p style="margin-left:1rem ;">
+											我的推荐码：
+											<span id="user_flags"></span>
+										</p>
+										
+										<!--<p style="margin: 0.5rem 0px 0.5rem 0px;"><span id="cpn_22">推荐地址：</span><span id="recommend_url" style="color: #FFFFFF;">---------</span></p> -->
+										<div style="float: left;width: 50%;margin-top:2rem;">
+											<button id="cpn_23" data-clipboard-text="成功复制" type="button" class="fild_button copy_btn" style="width: 60%;">
+												复制宣传语
+											</button>
+										</div>
+										<div style="float: right;width: 50%;margin-top:2rem;">
+											<button id="cpn_23_1" data-clipboard-text="成功复制" type="button" class="fild_button copy_btn1" style="width: 60%;">
+												复制推荐码
+											</button>
+										</div>
+										
+									</div>
+								</li>						
+							</ul> 	
+					</div>
+					<!--第二页  -->
+					<div id="item2mobile" class="mui-slider-item mui-control-content"  style="height: 32rem;">
+						
+						
+							<ul class="mui-table-view" style="background-color: rgba(0,0,0,0);margin: 1rem 0px 0px 0rem;">
+								<li style="margin-top: 1rem;">
+									<span ><span id="cpn_18">MOLC：</span><span id="user_MOLC_1"  style="color:#FFFFFF">----</span></span>
+								</li>
+								<li style="margin-top: 1rem;">
+									<span id="cpn_18">质押币：</span><span id="user_lock_MOLC_1"  style="color:#FFFFFF">----</span>
+								</li>
+								<li style="margin-top: 1rem;">
+									<span ><span id="cpn_18">挖矿时间：</span><span id="miner_time"  style="color:#FFFFFF">----</span></span>									
+								</li>
+								<li style="margin-top: 1rem;">
+									<span id="cpn_18">当前时间：</span><span id="curr_time"  style="color:#FFFFFF">----</span>
+								</li>
+								<li style="margin-top: 1rem;">
+									<span ><span id="cpn_18">已出矿：</span><span id="already_mining"  style="color:#FFFFFF">----</span></span>									
+								</li>
+								<li style="margin-top: 1rem;">
+									<span ><span id="cpn_18">正在挖矿：</span><span id="today_mining"  style="color:#FFFFFF">----</span></span>									
+									<p style="color: #00FF00;">注：取矿只能取已产出的矿，正在挖的矿尚未生成</p>
+									
+								</li>
+								
+							</ul>									
+							<div style="margin: 4rem 0px 2rem 0px;">
+								<button type="button" id="stop_miner_button" class="fild_button">取产出</button>
+							</div>	
+							<!--
+							<div style="margin: 4rem 0px 2rem 0px;">
+								<button type="button" onclick="add_day();" class="fild_button">测试加一天</button>
+							</div>-->	
+							<div style="margin-top:8rem;">
+								<span id="cpn_24" style="color: #0f0;font-size: 0.8rem;">注：退出质押挖矿需要矿工费，由MOLC链矿工收取，请在钱包留出足够MOLC作为矿工费</span>
+							</div>
+					</div>
+					<!--第三页  -->
+					<div id="item3mobile" class="mui-slider-item mui-control-content" style="height: 32rem;">
+						<ul  class="mui-table-view" style="background-color: rgba(0,0,0,0);margin-top:1rem;">
+							<li >
+								<label>母币：<span id="mather_coin">---</span></label>
+								<ul>
+									<li>
+										<p style="padding-top: 0.5rem;">
+											<label>抵押：</label>
+											
+											<div style="border-radius: 5px;border: 1px #ccc solid;padding-top:0.2rem;width: 60%;margin-left: 2rem;">
+												<progress id="progress_mather" value="60" max="100" style="width: 100%;">100%</progress>
+												<div id="can_unlock_mother_num" style="margin: -1.5rem auto auto 45%;">60%</div>
+												
+											</div>
+											
+											
+											
+											<a href="#" onclick="unlock_mother_coin();">解锁母币</a>
+										</p>
+									
+										<p>已解抵<span id="already_unlock_mather">---</span></p>
+									
+										<p>可解抵<span id="can_unlock_mather">---</span></p>
+									</li>
+								</ul>										
+							</li>
+							<li style="margin-top: 1rem;">
+								<span>挖矿：<span id="miner_MOLC1">---</span></span> 
+								<ul><li>
+									<p>
+										<a onclick="unlock_miner();" href="#">
+											取质押
+										</a>
+									</p>
+								</li></ul>
+								<ul><li>
+									<p>
+										已取矿：<span id="take_out_miner"></span>
+									</p>
+								</li></ul>
+								
+								<ul><li>
+									<p>
+										<label id="take_out_day"></label>
+										
+										<a onclick="take_out_already();">取出：</a>
+									</p>
+								</li></ul>
+								
+							</li>
+							<li style="margin-top: 1rem;">
+								<span>算力</span>
+								<ul>
+									<li>
+										<p>权益算力：<span id="static_power">---</span></p> 
+									
+										<p>超权益算力：<span id="trends_power">---</span></p>
+										<p>V级别：<span id="v_power_jb">---</span></p> 
+										<p>V算力：<span id="v_power">---</span></p> 
+										<!--
+										<button class="fild_button" onclick="get_V_power();">领取V算力</button>
+										-->
+									</li>
+								</ul>
+							</li>
+							<li style="margin-top: 1rem;">
+								<span>全网算力</span>
+								<ul>
+									<li>
+										<p>权益算力：<span id="total_static_power">---</span></p>									
+										<p>全网超权益算力：<span id="total_trends_power">---</span></p>
+										<p>全网V算力：<span id="total_V_power">---</span></p>
+									</li>
+								</ul>
+							</li>
+							
+						</ul>
+					</div>
+				</div>
+			</div>	
+			
+		</div>
+		<!--模式窗口 -->
+		<div id="modal" class="mui-modal" style="background:linear-gradient(to left,#001658, #203678);">
+			 
+			<div class="mui-bar mui-bar-nav" style="background-color: rgba(0,0,0,0.2);">
+				<a class="mui-icon mui-icon-close mui-pull-right" href="#modal"></a>
+				<img class="mui-pull-left" src="../images/logo.png" style="width: 2rem;height: 2rem;margin-top: 0.4rem;">
+				<h1 class="mui-title" style="color: #FFF;">历史记录</h1>
+			</div>
+			<div class="mui-content" style="margin-top:2.5rem;background-color: rgba(0,0,0,0);">
+			<div style="padding: 10px 10px;">
+				<div id="segmentedControl" class="mui-segmented-control" style="background-color: rgba(0,0,0,0);">
+					<a class="mui-control-item mui-active" href="#item2">挖矿记录</a>
+					<a class="mui-control-item" href="#item1">转入记录</a>					
+					<a class="mui-control-item" href="#item3">转出记录</a>
+				</div>
+			</div>						
+				<!--第1页-->
+				<div id="item2" class="mui-control-content mui-active">
+					<div style="width:100%; height:30rem; overflow-y: scroll; overflow-x:hidden;">	
+						<ul id="show_2" class="mui-table-view" style="background-color: rgba(0,0,0,0);">
+							
+						</ul>
+					</div>
+				</div>
+				<!--第2页-->
+				<div id="item1" class="mui-control-content" style="background-color: rgba(0,0,0,0);">
+					<div style="width:100%; height:30rem; overflow-y: scroll; overflow-x:hidden;">
+						<ul id="show_1" class="mui-table-view" style="background-color: rgba(0,0,0,0);">
+							
+						</ul>
+					</div>
+				</div>
+				<!--第3页-->
+				<div id="item3" class="mui-control-content" style="background-color: rgba(0,0,0,0);">
+					<div style="width:100%; height:30rem; overflow-y: scroll; overflow-x:hidden;">
+						<ul id="show_3" class="mui-table-view" style="background-color: rgba(0,0,0,0);">
+							
+						</ul>
+					</div>
+				</div>
+			</div>			
+		</div>
+		<!--模式窗口结束 -->
+		<script src="../js/air.js"></script> 
+		<script type="text/javascript">
+			
+			mui.init()
+			mui.plusReady(function() {
+				document.getElementById('back_group').addEventListener('drag', function(event) {
+                　　        event.stopPropagation();//关闭侧滑功能 
+                    });	
+				
+				getElem('start_miner_button').addEventListener('click',function(){
+					var can_MOLC=Number(getElem('chain_MOLC').innerHTML);				
+					var send_MOLC=Number(getElem('input_box_MOLC').value);
+					var already_mining=Number(getElem('already_mining').innerHTML);
+					if(already_mining > 0){
+						alert('请先取出已产出的矿，否则会被覆盖掉');
+						return;
+					}
+					
+					getElem('show_stage').innerHTML='验证挖矿条件...';
+					if(send_MOLC+0.01 > Number(can_MOLC))
+					{
+						MessageBox('你的MOLC数量不足');
+						getElem('load_ico').style.display = "none";
+						getElem('show_stage').innerHTML='等待MOLC链确认...';
+						return;
+					}					
+					if(send_MOLC < 100)
+					{
+						MessageBox('质押挖矿最低投入100 MOLC');
+						getElem('load_ico').style.display = "none";
+						getElem('show_stage').innerHTML='等待MOLC链确认...';
+						return;
+					}
+					
+					//判断是否有推荐人
+					var fa_input=getElem('source_before').value;
+					if(fa_input.length < 4){
+						alert('请输入你的推荐人邀请码，没有推荐人请加微信群找一个推荐人');
+						return;
+					}									
+					getElem('load_ico').style.display = "block";
+					getElem('show_stage').innerHTML='验证推荐码...';
+					console.log('发送请求id='+eth_data.ID+'；f_id='+eth_data.sourceID); 
+					if(eth_data.ID.length <1 || eth_data.address.length !=42){
+						console.log('我的ID='+eth_data.ID+'---我的地址='+eth_data.address);
+						alert('请等待数据刷新');return;
+					}
+					send_miner();
+				});
+				
+				function send_miner(){
+					var can_MOLC=Number(getElem('chain_MOLC').innerHTML);
+					var send_MOLC=Number(getElem('input_box_MOLC').value);
+					var fa_input=getElem('source_before').value;
+					var sourceID=base36_to_num(fa_input);
+					getElem('show_stage').innerHTML='等待MOLC链确认...';	
+					call_main_contract('set_miner',sourceID,'"'+toWei(send_MOLC)+'"','质押挖矿');
+					getElem('input_box_MOLC').value = 0;
+				}
+				//检查矿工费
+				getElem('stop_miner_button').addEventListener('click',function(){
+					var proft=Number(eth_data.static_profit)+Number(eth_data.trends_profit);
+					if(proft <=0 ){ 
+						alert('没有矿产出');
+						return;
+					}
+					
+					call_main_contract('take_out_miner','','0','取矿');
+				});
+				
+				//获得区块信息
+				setTimeout(function() { 					
+					setInterval(produce_mine,1000);
+				}, 3000);
+			});
+			function unlock_miner(){
+				if(isNaN(eth_data.molc_miner ) || eth_data.molc_miner <=0){
+					alert('没有抵押');
+					return;
+				}
+				call_main_contract('unlock_miner','','0','取质押需要等待5天后，从质押明细挖矿栏取出，取质押');
+			}
+			function get_V_power(){//领取v算力
+				var v=Number(eth_data.user_v_power); 
+				if(isNaN(v) || v ==0){
+					alert('没有V算力可领取');
+					return;
+				}
+				call_main_contract('take_of_Vpower','','0','取V算力');
+			}
+			function unlock_mother_coin(){
+				call_main_contract('unlock_mother_coin','','0','解锁母币需要等待5天后，从质押明细挖矿栏取出，解锁母币');
+			}
+			function take_out_already(){
+				if(getElem('take_out_day').innerHTML !='可取矿'){
+					alert(getElem('take_out_day').innerHTML);
+					return;
+				}
+				call_main_contract('take_out_unlock','','0','取抵押');
+			}
+			function add_day(){
+				call_main_contract('add_debug_time','','0','增加一天');
+			}
+			function get_message(sys,msg)
+			{
+				getElem('chain_MOLC').innerHTML=Math.round(msg.MOLC*10000)/10000;
+				getElem('user_MOLC_1').innerHTML=Math.round(msg.MOLC*10000)/10000;
+				getElem('user_lock_MOLC_1').innerHTML=Math.round((Number(msg.molc_miner)+Number(msg.molc_mother))*10000)/10000;
+				getElem('miner_MOLC1').innerHTML=Math.round(msg.molc_miner*10000)/10000;
+				//挖矿时间
+				getElem('miner_time').innerHTML=get_time(msg.take_out_time);
+				getElem('curr_time').innerHTML=get_time(sys.today);
+				//最低挖矿量=50 *10000 / molctousdt
+				getElem('miner_minimum').innerHTML='50 USDT';//Math.ceil(50 *100 / Number(sys.molc_To_Usdt))*100;
+				//母币
+				
+				getElem('mather_coin').innerHTML = Math.round(msg.molc_mother*10000)/10000; 
+				//母币总量和解锁量				
+				var curr_tim=Date.parse(new Date())/1000;
+				var tim = (curr_tim - sys.start_time)/86400;
+				tim =Math.round( tim );
+				tim =tim *0.5 ; 
+				getElem('can_unlock_mother_num').innerHTML=tim + ' %';
+				getElem('progress_mather').value = tim;
+				//母币已解抵：
+				tim =tim / 100 * Math.round((Number(msg.already_take) + Number(msg.molc_mother))*10000)/10000;
+
+				getElem('already_unlock_mather').innerHTML = Math.round(msg.already_take);
+				//可解抵
+				getElem('can_unlock_mather').innerHTML =Math.round(tim - msg.already_take);
+				//取矿量
+				
+				getElem('take_out_miner').innerHTML =Math.round(msg.take_miner*10000)/10000;
+				//取矿时间
+				if(msg.take_miner >0){
+					var day=curr_tim /86400 - Number(msg.last_take_time);
+					//day = day >0?day:0;
+					day=5- Math.floor(day);
+					if(day >0)
+						getElem('take_out_day').innerHTML='离出矿还有'+ day+'天';
+					else getElem('take_out_day').innerHTML='可取矿';
+				}else getElem('take_out_day').innerHTML='尚未取矿';
+				
+				if(msg.user_index >0)
+					getElem('user_flags').innerHTML=num_to_base36(msg.user_index);
+				else getElem('user_flags').innerHTML='无';
+
+				getElem('static_power').innerHTML=Math.round(msg.static_power*10000)/10000;
+				getElem('total_static_power').innerHTML=Math.round(sys.sys_static_power*10000)/10000;
+				getElem('trends_power').innerHTML=Math.round(msg.trends_power*10000)/10000;
+				getElem('v_power').innerHTML=Math.round(msg.user_v_power*10000)/10000;	
+				getElem('total_trends_power').innerHTML=Math.round(Number(sys.sys_trends_power)*10000)/10000;
+				getElem('total_V_power').innerHTML=Math.round(Number(sys.sys_v_power)*10000)/10000;
+				
+				if(Number(msg.user_v_power) ==0)getElem('v_power_jb').innerHTML ='V0';
+				else if(Number(msg.user_v_power) <7400)getElem('v_power_jb').innerHTML ='V1';
+				else if(Number(msg.user_v_power) <14600)getElem('v_power_jb').innerHTML ='V2';
+				else if(Number(msg.user_v_power) <25000)getElem('v_power_jb').innerHTML ='V3';
+				else if(Number(msg.user_v_power) >=25000)getElem('v_power_jb').innerHTML ='V4';
+				
+				eth_data={
+					ID:msg.user_index,
+					sourceID:msg.sourceID,
+					address:msg.address,
+					sys_static_power:sys.sys_static_power,
+					sys_trends_power:sys.sys_trends_power,
+					sys_v_power:sys.sys_v_power,
+					static_profit:msg.static_profit,
+					trends_profit:msg.trends_profit,
+					static_power:msg.static_power,
+					trends_power:msg.trends_power,
+					user_v_power:msg.user_v_power,
+					molc_miner:msg.molc_miner,
+					output_static:sys.output_static,
+					output_trends:sys.output_trends,
+				};
+				if(eth_data.sourceID > 0){
+					getElem('source_before').value=num_to_base36(eth_data.sourceID);
+				}
+			}
+	var eth_data=[];
+
+	function produce_mine()
+	{
+		//console.log(eth_data.sys_static_power);
+		var t=Date.parse(new Date())/1000;
+		t=t % 86400;//得到从0到现在的时间
+		var proft=Number(eth_data.static_profit)+Number(eth_data.trends_profit);//已产出的静态收益+动态收益
+
+		if(proft <= 0){
+			getElem('already_mining').innerHTML='未挖矿';
+		}
+		getElem('already_mining').innerHTML=Math.round(proft*10000)/10000;
+		proft=0;
+		//今日获得的静态收益=我的静态算力/系统总算力 * 日产量 *t/86400;
+		var temp1=eth_data.sys_static_power;
+		var temp;
+		if(temp1 >0){
+			temp=eth_data.static_power/eth_data.sys_static_power;			
+			temp = temp * eth_data.output_static * t / 86400;
+			proft += temp;
+		}
+		
+		temp1=(Number(eth_data.sys_trends_power) + Number(eth_data.sys_v_power));
+		if(temp1 >0){
+			temp=Number(eth_data.trends_power) + Number(eth_data.user_v_power);		
+			temp=temp /temp1;
+			temp = temp *eth_data.output_trends *t / 86400;
+			proft +=temp;
+		}
+		proft=Math.round(proft*1000000)/1000000;
+		getElem('today_mining').innerHTML=proft;
+		
+	}	
+		</script>
+	</body>
+
+</html>
