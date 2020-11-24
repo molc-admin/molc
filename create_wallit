@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>MOLC</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="../css/app.css" />
+		<link rel="stylesheet" href="../Public/Mobile/ecshe_css/wapmain.css?v=1543408652" />
+
+		<style>	
+			.title { 
+				margin: 20px 15px 10px;
+				color: #6d6d72;
+				font-size: 15px;
+				padding-bottom: 51px;
+			}
+			
+		</style>
+	</head>
+	
+	<body>
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/child_tool.js"></script>
+		<script src="../js/clipboard.js"></script>
+		<script src='../js/molc_key.js'></script>
+		<script >
+			var clipboard = new Clipboard('.copybtn2');
+			clipboard.on('success', function(e) 
+			{
+				next_key_button.innerHTML = '下一条';
+				console.log('点完私钥退出')
+				document.querySelector(".mui-modal").classList.remove("mui-active");
+				//通知主页面显示账户了	
+				alert('钱包创建成功');
+				call_main_func('add_key_to_user','"'+new_addr+'",'+'"'+new_pkey+'"');
+				
+			});		 
+			clipboard.on('error', function(e) {
+				console.log(e);
+			});
+			function copy_pra_key()
+			{
+				var text=new_pkey;
+				text=EthToMolc(text);
+				document.getElementById('copybtn2').setAttribute("data-clipboard-text",text);
+				document.getElementById('copybtn2').click();
+			}
+		</script>
+		
+		<div id="load_ico" style="position: absolute;inline-start;margin: 10rem 10rem 10rem 8rem; z-index:9999;display: none;">
+			<span class="mui-spinner" style="width:5rem;height:5rem;"></span> 
+		</div>
+		<div class="mui-content cur-padding-bottom" style="background:inherit;">
+			<div class="mylogin">
+				<p class="title"><b>创建钱包</b></p>
+				 
+				<div class="login-input-group">
+					
+					<p  style="color: #FFFFFF;font-size: 12px;">
+						密码用于保护私钥和交易授权，强度非常重要
+					</p>
+						<p  style="color: #FFFFFF;font-size: 12px;">
+							钱包不存储密码，也无法找回，请务必牢记
+						</p>
+					<div class="mui-input-row">
+						<input type="password" name="password" id="edit_pass_word" class="mui-input-clear mui-input-password" autocomplete="off" placeholder="登录密码">
+					</div>
+					<div class="mui-input-row">
+						<input type="password" name="password" id="edit_pass_word_ok" class="mui-input-clear mui-input-password" autocomplete="off" placeholder="登录密码">					
+					</div>
+					
+					<div class="mui-button-row" style="margin-top:25px;">
+						<button type="button" onclick="creart_wallet();" class="fild_button">创建钱包</button>
+					</div>
+					<div style="float: left;">
+						<button id="login_wallet" type="button" class="mui-btn mui-btn-link">
+							登录钱包
+						</button>			
+					</div>
+					<div style="float: right;">			
+						<button id="import_wallet" type="button" class="mui-btn mui-btn-link">
+							导入钱包
+						</button>		
+					</div>
+				</div>
+				
+			</div> 
+			
+		</div>
+	
+	
+		
+		<!--强制记录私钥框-->
+		
+		<div id="modal" class="mui-modal" style="background:linear-gradient(to left,#001658, #203678);">
+			<header class="mui-bar mui-bar-nav">
+				<a class="mui-icon mui-icon-close mui-pull-right" href="#modal"></a>
+				<h1 class="mui-title">请记录私钥</h1>
+			</header>
+			
+			<div class="mui-content " style="margin-top: 3rem;background-color: rgba(0,0,0,0.2);"> 
+				<p style="background-color: rgba(0,0,0,0.2);">私钥非常重要，请用笔记录下全部私钥，如果今后忘记了密码，不小心删除了本APP，手机掉了等情况，就只能靠导入私钥获得账户资金。尽量不要用复制功能以防手机有病毒</p>
+				<h3 style="font-size: 1.5rem;text-align: center;">第<span id="key_index">1</span>条共<span id="key_count">10条</span></h3>
+				<h1 style="font-size: 2.5rem;text-align: center;" class="mui-content-padded" id="current_key"></h1>
+				
+			</div>
+			
+			<button class="copybtn2" data-clipboard-text="成功复制" id="copybtn2" hidden="true">
+				复制
+			</button>
+			
+			
+			<div  class="mui-input-row" style="margin: 10px 5px;">
+				<textarea id="show_p_key" rows="5" placeholder="请输入私钥" style="font-size: 0.8rem;background-color: rgba(255,255,255,0.2);"></textarea>
+			</div>
+			<div style="text-align: center;">
+				<button onclick="copy_pra_key();" id="next_key_button" type="button" class="mui-btn mui-btn-royal">
+					复制好了退出
+				</button>
+			</div>
+		</div>
+		<!--强制记录私钥框结束-->
+		
+		</div>
+		<script  type="text/javascript" src="../js/web4.js"></script>
+		<script type="text/javascript">
+			function get_message(msg){;}
+			(function() {
+				mui.init({
+					swipeBack: true //启用右滑关闭功能
+				});			
+			})();
+			var web4;
+			mui.plusReady(function() {
+				getElem('login_wallet').addEventListener('click',function(e){
+					call_main_func('open_html',0);
+				});
+				getElem('import_wallet').addEventListener('click',function(e){
+					call_main_func('open_html',2);
+				});
+			});
+			
+			function creart_wallet()
+			{
+				let password=getElem('edit_pass_word').value;
+				let password_ok=getElem('edit_pass_word_ok').value;
+				if(password.length<6){
+					alert('密码至少6位');
+					return;
+				}
+				if(password_ok.length<6){
+					alert('确认密码至少6位');
+					return;
+				}
+				if(password != password_ok){
+					alert('两次输入密码不同');
+					return;
+				}
+				getElem('edit_pass_word').value="";
+				getElem('edit_pass_word_ok').value="";
+				show_load_ico();
+				call_main_func("create_wallet",'"'+password+'"'); 
+			} 
+			//强制弹出私钥框
+			var new_pravite_key=[];
+			var new_addr;
+			var new_pkey;
+			var pk_count;
+			
+			function show_key_press_box(addr,key)
+			{
+				new_addr=addr;
+				new_pkey=key;
+				if(new_pkey.slice(0,2)=="0x")new_pkey=new_pkey.slice(2);
+				getElem('show_p_key').innerHTML=EthToMolc(new_pkey) ;
+				document.querySelector(".mui-modal").classList.add("mui-active");
+				var l=new_pkey.length; 
+				pk_count=Math.ceil(l/5) ;
+				for(var i=0;i<pk_count;i++)
+				{
+					new_pravite_key[i]=new_pkey.substring(i*5,i*5+5);
+					
+				}
+				getElem('key_index').innerHTML=0;
+				time_num=0;
+				//next_key();
+			}
+			/*
+			var time_num=0;
+			var next_key_button=getElem('next_key_button');
+			function next_key()
+			{	
+				if(time_num == pk_count)//退出
+					next_key_button.innerHTML = '退出';
+				else if(time_num - 1 == pk_count) //退出
+				{
+					next_key_button.innerHTML = '下一条';
+					console.log('点完私钥退出')
+					document.querySelector(".mui-modal").classList.remove("mui-active");
+					//通知主页面显示账户了
+					alert('钱包创建成功');
+					call_main_func('add_key_to_user','"'+new_addr+'",'+'"'+new_pkey+'"');
+					
+				}
+				else 
+				{
+					next_key_button.innerHTML = '下一条';					
+					getElem('key_index').innerHTML=time_num+1;
+					getElem('key_count').innerHTML=new_pravite_key.length+'条';
+					getElem('current_key').innerHTML=new_pravite_key[time_num];
+				}
+				time_num++;	
+			}*/
+		</script>
+	</body>
+</html>
