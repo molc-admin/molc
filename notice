@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+
+	<head >
+		<meta charset="utf-8">
+		<title>MOLC</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link href="../css/app.css" rel="stylesheet" />
+		<script src="../js/mui.js"></script>
+		<script src="../js/child_tool.js"></script>
+		<script type="text/javascript" src="../Public/Mobile/js/jquery-1.11.3.min.js"></script>
+
+		<style>
+				.mui-table-view .mui-icon {margin-bottom:0.3125rem;font-size:1.875rem!important;}
+				.layui-layer-demo .layui-layer-title{border: none;background-color: #333;color: #fff;text-align: center;padding: 0}
+				.layui-layer-demo {width: 70%;background-color: #eee}
+				.layui-layer-demo .type_list {line-height: 40px;border-bottom: #999 1px solid;padding:0 10px;}
+				.layui-layer-demo .type_set {width: 90%;margin:  0 auto;padding: 10px 0;}
+			</style>
+	</head>
+	
+	<body>
+		<div id="header" class="mui-bar mui-bar-transparent">
+			<img class="mui-pull-left" src="../images/molc.png"  style="width: 2rem;height: 2rem;margin-top: 0.4rem;">
+			<h1 class="mui-title" style="color: #FFF;">公告</h1>
+		</div>
+		<!--星空背景-->
+		<div  id="demo">	
+		  <div class="canvaszz"></div>
+		  <canvas id="canvas" style="position:absolute;"></canvas> 
+		</div>
+		<!--星空背景结束-->
+		<div class="mui-slider" >
+			<div class="mui-slider-group" style="margin-top: 2.5rem;">
+				<div class="mui-slider-item"><a href="#"><img src="../images/banner1.jpg" /></a></div>
+				<div class="mui-slider-item"><a href="#"><img src="../images/banner1.jpg" /></a></div>
+				<div class="mui-slider-item"><a href="#"><img src="../images/banner1.jpg" /></a></div>
+			</div>
+			<div class="mui-slider-indicator">
+				<div class="mui-indicator mui-active"></div>
+				<div class="mui-indicator"></div>
+				<div class="mui-indicator"></div>
+			</div>
+		</div>
+		
+		<!-- --滚动公告开始-->
+		<div style="padding: 0.3rem 1rem 0.3rem 1rem;">
+			<marquee id="yu_gao" style="color: #00ff00;">预告：下一步开放交易历史记录</marquee> 
+		</div>			
+		<!-- --滚动公告结束-->
+		<br>		
+		<ul id="notice_box">
+
+		</ul>
+		
+		<!--强制记录私钥框-->
+		<div id="modal" class="mui-modal" style="background:linear-gradient(to left,#313e51, #111e31);">
+			<div class="mui-bar mui-bar-nav">
+				<a class="mui-icon mui-icon-close mui-pull-right" href="#modal"></a>
+				<h1 class="mui-title" style="color:#FFF;">公告</h1>
+			</div>			
+			<div  class="msg_box " style="margin-top: 3rem;padding: 1rem;background-color: rgba(0,0,0,0.2);"> 
+				<p style="color:#FFF;margin-top: 1rem;">亲爱的MOLC家人们，您好！</p>
+				<p id="notice_text" style="color:#FFF;margin-top: 1rem;">
+				<p style="color:#FFF;margin-top: 1rem;">感谢您跟MOLC风雨同舟，不离不弃！让我们一起创造MOLC的奇迹。</p>
+				<br>
+				<p style="text-align: right;color:#FFF;margin-top: 1rem;">MOLC技术团队</p>
+				<p id="notice_time"  style="text-align: right;color:#FFF;margin-top: 1rem;">2020-11-04</p>
+			</div>			
+			
+		</div>
+		<!--强制记录私钥框结束-->
+		<!--<script src="../js/air.js"></script>-->
+		<script>
+		mui.plusReady(function() {
+			$.getJSON('https://moler.vip/app/php/notice.php?a=' + Math.random(), function (d) {
+				document.getElementById('yu_gao').innerHTML = d.Pre;
+				var count = Object.keys(d).length;				
+				document.getElementById('yu_gao').innerHTML=d['Pre'];
+				call_main_func('show_notice','"'+d['Pre']+'"');
+				var html='';
+				for(var i=1;i<count;i++){
+					html = 
+					'<li onclick="on_show_notice_click(this);" title="'+d[i].title+'" msg="'+d[i].msg+'" time="'+d[i].time+'">'+
+						'<div class="mui-slider-cell" >'+
+							'<div class="oa-contact-cell mui-table">'+								
+								'<div class="oa-contact-content mui-table-cell">'+
+									'<div class="mui-clearfix">'+
+										'<h4 class="oa-contact-name">'+
+										d[i].title+
+										'</h4>'+
+										'<span class="oa-contact-position mui-h6">'+
+										d[i].msg+
+										'</span>'+
+									'</div>'+
+									'<p class="oa-contact-email mui-h6" style="text-align: right;">'+
+										d[i].time+
+									'</p></div></div></div></li>'+html;
+				}			
+				document.getElementById('notice_box').innerHTML =html;
+			});
+		});
+		function on_show_notice_click(sender){ 
+			document.getElementById('notice_text').innerHTML=sender.getAttribute('msg');
+			document.getElementById('notice_time').innerHTML=sender.getAttribute('time');
+			document.querySelector(".mui-modal").classList.add("mui-active");
+		}
+		function get_message(sysmsg,msg) {}; 
+		</script>
+	</body>
+
+</html>
