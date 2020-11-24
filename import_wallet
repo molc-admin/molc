@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>MOLC</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<!--标准mui.css-->
+		<link rel="stylesheet" href="../css/mui.min.css">	
+		<link rel="stylesheet" href="../css/app.css">	
+		<script src="../js/mui.min.js"></script>
+		<script src="../js/child_tool.js"></script>
+		<script src='../js/molc_key.js'></script>
+		<!--App自定义的css-->
+		<!--<link rel="stylesheet" type="text/css" href="../css/app.css" />-->
+		<style>
+			.float_Div{
+				margin: auto auto auto auto;	
+				border: outset rgb(228,228,228);
+				border-width: 10px;
+				padding: 50% 0rem 0rem 0rem ;
+				line-height:2;
+				font-size:1.5rem;
+				color:#000000;
+				background:linear-gradient(to left,#FFFFFF, #AAAAAA);
+			    width:100%;
+				height: 100%;
+			    top:0px;
+			    float:inherit;
+			    position:fixed;
+			    z-index:10000000;    
+			    _position:absolute;
+				text-align: center;
+				vertical-align: middle;				
+			    }
+			
+		</style>
+	</head>
+
+	<body>
+
+		<style>
+			.mui-control-content {
+				background-color: white;
+				min-height: 215px;
+			}
+			.mui-control-content .mui-loading {
+				margin-top: 50px;
+			}
+		</style>
+		<div class="mui-bar mui-bar-nav" style="background-color: rgba(0,0,0,0.2);">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title" style="color: #FFF;">导入钱包</h1> 
+		</div>
+		<div id="load_ico" style="position: absolute;inline-start;margin: 10rem 10rem 10rem 6rem; z-index:9999;display: none;">
+			<span class="mui-spinner" style="width:10rem;height:10rem;"></span> 
+		</div>
+		<div style="margin:12rem 2rem auto 2rem;">
+			<div class="mui-slider-group" >
+				<div id="item1mobile" class="mui-slider-item mui-control-content mui-active" style="background-color: rgba(0,0,0,0);">
+				<div  style="padding:5% 5% 0px 10%;" >
+					<textarea id="text_pravate_key_1" rows="5" placeholder="请输入私钥" class="fild_textarea"></textarea>
+					
+				
+						<input id="pass_word_1" type="password" class="fild_input" placeholder="请输入密码" style="background-color: rgba(0,0,0,0);">
+					
+					
+					
+					<div class="mui-content-padded" style="text-align: center;">
+						<button type="button" id="import_wallet" class="fild_button" style="width: 100%;margin-top: 3rem;"> 导入钱包 </button>
+						<div style="float: left;margin-top: 1rem;">
+							<button id="login_wallet" type="button" class="mui-btn mui-btn-link">
+								登录钱包
+							</button>			
+						</div>
+						<div style="float: right;margin-top: 1rem;">			
+							<button id="create_wallet" type="button" class="mui-btn mui-btn-link">
+								创建钱包
+							</button>
+						</div>
+					</div>
+				</div>
+				</div>
+				
+				
+			</div>
+		</div>
+	
+	<script type="text/javascript">
+		function get_message(msg){;}	
+		(function() {
+			mui.init({
+				swipeBack: true //启用右滑关闭功能
+			});	
+		})();
+		mui.plusReady(function() {
+			
+			getElem('create_wallet').addEventListener('click',function(e){
+				getElem('load_ico').style.display = "none";
+				call_main_func('open_html',1);
+			});
+			getElem('login_wallet').addEventListener('click',function(e){
+				getElem('load_ico').style.display = "none";
+				call_main_func('open_html',0);
+			});	
+			getElem('import_wallet').addEventListener('click',function(e){				
+				let text_pravate_key=document.getElementById("text_pravate_key_1").value;								
+				let pass_word_1=getElem('pass_word_1').value;
+
+				if(pass_word_1.length <6){alert('密码最少6位');return;}
+				
+				
+				text_pravate_key=MolcToEth(text_pravate_key);
+				if(text_pravate_key == '')return;
+				
+				let info={
+					'key_word':text_pravate_key,
+					'pass_word':pass_word_1
+				};
+				if(info.key_word.substring(0,2)!='0x')
+				{
+					info.key_word='0x'+info.key_word;
+				}
+				getElem('load_ico').style.display = "block";
+				call_main_func('import_wallet',JSON.stringify(info)); 
+				getElem('pass_word_1').value='';
+				document.getElementById("text_pravate_key_1").value = '';
+				document.getElementById("text_pravate_key_1").innerHTML = '';
+				
+			});
+			/*
+			getElem('import_old_wallet').addEventListener('click',function(e){
+				//getElem('load_ico').style.display = "none";
+				
+				var pass_word_2=getElem('pass_word_2').value;
+				var pass_word_ok_2=getElem('pass_word_ok_2').value;
+				if(pass_word_2.length <6 || pass_word_ok_2.length<6)
+				{
+					alert('请输入密码');
+					return;
+				}
+				if(pass_word_2 != pass_word_ok_2)
+				{
+					alert('两次输入不同');return;
+				}	
+				call_main_func('import_old','"'+pass_word_2+'"');
+			});	*/
+		});	
+		
+		
+	</script>
+	</body>
+</html>
+ 
