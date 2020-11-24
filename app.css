@@ -1,0 +1,127 @@
+/*
+ *这是单独为hello mui准备的个性化css，可以覆盖标准mui的css定义；
+ * 在实际项目开发时，建议为App单独写一个css文件，从而实现项目的自定义皮肤功能；
+ * 
+ * */
+.mui-plus header.mui-bar{
+	display: none;
+}
+.mui-plus .mui-bar-nav~.mui-content{
+	padding: 0;
+}
+
+/*hm开头的表示仅为 Hello MUI示例定义*/
+.hm-description{
+	margin: .5em 0;
+}
+
+.hm-description>li {
+	font-size: 14px;
+	color: #8f8f94;
+}
+
+body{
+	background:linear-gradient(to left,#313e51, #111e31);
+	
+	color: #FFFFFF; 
+	}
+html{
+	touch-action: none;
+}
+li{
+	margin: 0.5rem 0.5rem 0.5rem 0.5rem;
+	border-style:none;
+	box-shadow: 0 5px 10px -5px #151725;
+}
+
+li:visited { 
+color:#0000FF; 
+text-decoration:none; 
+} 
+li:hover { 
+color:#FF00FF; 
+text-decoration:none; 
+} 
+li:active { 
+color:#D200D2; 
+text-decoration:none; 
+} 
+
+
+
+.msg_box{
+	margin: auto auto auto 5%;
+	padding:  0.5rem 0px 0.5rem 0px;			
+	font-size:24;
+	color:#FFF;
+	background-color:rgba(0,0,0,0.1);
+	width:90%;
+	border-radius:10px;
+	-moz-border-radius:10px; 
+	 -webkit-box-shadow:0 0 10px 3px #6070a0;
+	 -moz-box-shadow:0 0 10px 3px #6070a0;
+	box-shadow:0 0 10px 3px #6070a0;
+}
+.fild_button{
+	background-color: rgba(100,110,128,0.3);
+	color: #FFF;
+	width: 50%;
+	border: 0px solid #6070a0;
+	border-radius:1rem;
+	box-shadow:0 0 5px 3px #6070a0;
+	display:block;
+	margin:1rem auto 0rem auto;
+}
+.fild_textarea{
+	font-size: 0.8rem;
+	background-color: rgba(255,255,255,0);
+	border: 0px solid #607080;
+	border-radius:0.5rem;
+	-webkit-box-shadow:0 0 5px 2px #6070a0;
+}
+.fild_input{
+	font-size: 0.8rem;
+	background-color: rgba(96,112,160,0.5);
+	border: 0px solid #607080;
+	border-radius:0.5rem;
+	-webkit-box-shadow:0 0 5px 2px #6070a0;
+	margin-top: 2rem;
+}
+.fd_icon{
+	 -webkit-box-shadow:0 0 5px 2px #058;
+	 -moz-box-shadow:0 0 5px 2px #058;
+	box-shadow:0 0 5px 2px #058;
+}
+
+.mui-plus .plus{
+				display: inline;
+			}
+			
+			.plus{
+				display: none;
+			}
+			
+			#topPopover {
+				position: fixed;
+				top: 16px;
+				right: 6px;
+			}
+			#topPopover .mui-popover-arrow {
+				left: auto;
+				right: 6px;
+			}
+			p {
+				text-indent: 22px;
+			}
+			span.mui-icon {
+				font-size: 14px;
+				color: #007aff;
+				margin-left: -15px;
+				padding-right: 10px;
+			}
+			.mui-popover {
+				height: 300px;
+			}
+			.mui-content {
+				padding: 10px;
+			}
